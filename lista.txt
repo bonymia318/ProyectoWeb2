@@ -1,0 +1,22 @@
+#	Criterio	Pts
+1	La app inicia sin errores con npm run dev	5 👍
+2	Navegación entre todas las rutas y página 404	5 
+3	Contador del carrito visible en el encabezado	3
+4	Catálogo cargado desde la API	5 👍
+5	Buscador por nombre (/products/search?q=)	6
+6	Filtro por categoría (/products/categories y /products/category/{cat})	6
+7	Ordenamiento por precio y nombre (asc/desc)	5
+8	Paginación de 12 en 12 (limit/skip, Anterior/Siguiente, página actual)	6
+9	Detalle con galería, descuento y reseñas	6
+10	Cantidad limitada al stock	3 👍
+11	Carrito: aumentar, disminuir, eliminar y vaciar	6 😒
+12	Subtotales y total correctos	4 😒
+13	Carrito se conserva al recargar (localStorage)	4
+14	Login funcional y error con datos incorrectos	6
+15	Ruta protegida y cerrar sesión	5
+16	Checkout con validación por campo	5
+17	Confirmación de compra y carrito vacío	3
+18	Estados de carga, error con “Reintentar” y “sin resultados”	5 😒
+19	Responsive en celular (375 px)	4
+20	Estructura de carpetas, servicios, hooks y contexto; sin errores en consola	4 😒
+21	Código legible: nombres descriptivos y comentarios en servicios, hooks y contextos 😒
