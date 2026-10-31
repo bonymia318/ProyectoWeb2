@@ -1,14 +1,20 @@
+import { Link } from "react-router-dom";
+
 function Hero() {
-    return(
+    return (
         <section className="presentacion" id="inicio">
-            <span className="etiqueta"></span>
+            <span className="etiqueta">Tienda Universitaria</span>
 
-            <h2></h2>
+            <h2>Encuentra tu próximo dispositivo</h2>
 
-            <p></p>
+            <p>
+                Explora una selección de productos para estudiantes
+                y desarrolladores.
+            </p>
 
-            <a className="boton-principal" href="#productos">
-            </a>
+            <Link className="boton-principal" to="/productos">
+                Ver productos
+            </Link>
         </section>
     );
 }

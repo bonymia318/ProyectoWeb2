@@ -1,94 +1,96 @@
-import { useEffect, useState } from "react";
-import { obtenerProducto } from "./service/apiService";
-import Carrito from "./components/Carrito.jsx";
-import Footer from "./components/Footer.jsx";
-import Header from "./components/Header.jsx";
-import Hero from "./components/Hero.jsx";
-import ProductCard from "./components/ProductCard.jsx";
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Inicio from "./pages/Inicio";
+import Catalogo from "./pages/Catalogo";
+import Detalle from "./pages/Detalle";
+import Carrito from "./pages/Carrito";
+import Login from "./pages/Login";
+import MiCuenta from "./pages/MiCuenta";
+import Checkout from "./pages/Checkout";
+import NoEncontrada from "./pages/NoEncontrada";
 import "./App.css";
 
 function App() {
-  const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [mensaje, setMensaje] = useState("");
 
-  useEffect(() => {
-    async function cargarProductos() {
-      try {
-        setProductos(await obtenerProducto());
-      } catch (error) {
-        setMensaje(error instanceof Error ? error.message : "Error desconocido");
-      } finally {
-        setCargando(false);
-      }
-    }
-
-    cargarProductos();
-  }, []);
-
+  // Agrega un producto o suma 1 a su cantidad (sin pasar del stock)
   function agregarProducto(producto) {
-    setCarrito((actual) => {
-      const existente = actual.find((item) => item.id === producto.id);
-      if (existente?.cantidad >= producto.stock) return actual;
-
-      return existente
-        ? actual.map((item) =>
-            item.id === producto.id
-              ? { ...item, cantidad: item.cantidad + 1 }
-              : item
-          )
-        : [...actual, { ...producto, cantidad: 1 }];
+    const existente = carrito.find(function (item) {
+      return item.id === producto.id;
     });
+
+    if (existente) {
+      if (existente.cantidad >= producto.stock) {
+        return;
+      }
+      const nuevoCarrito = carrito.map(function (item) {
+        if (item.id === producto.id) {
+          return { ...item, cantidad: item.cantidad + 1 };
+        }
+        return item;
+      });
+      setCarrito(nuevoCarrito);
+    } else {
+      setCarrito([...carrito, { ...producto, cantidad: 1 }]);
+    }
   }
 
+  // cambio vale +1 o -1; la cantidad debe quedar entre 1 y el stock
   function cambiarCantidad(id, cambio) {
-    setCarrito((actual) =>
-      actual
-        .map((item) => {
-          if (item.id !== id) return item;
-          const cantidad = item.cantidad + cambio;
-          return cantidad > 0 && cantidad <= item.stock
-            ? { ...item, cantidad }
-            : item;
-        })
-        .filter((item) => item.cantidad > 0)
-    );
+    const nuevoCarrito = carrito.map(function (item) {
+      if (item.id === id) {
+        const nuevaCantidad = item.cantidad + cambio;
+        if (nuevaCantidad >= 1 && nuevaCantidad <= item.stock) {
+          return { ...item, cantidad: nuevaCantidad };
+        }
+      }
+      return item;
+    });
+    setCarrito(nuevoCarrito);
   }
 
-  const cantidadCarrito = carrito.reduce(
-    (total, producto) => total + producto.cantidad,
-    0
-  );
+  function eliminarProducto(id) {
+    const nuevoCarrito = carrito.filter(function (item) {
+      return item.id !== id;
+    });
+    setCarrito(nuevoCarrito);
+  }
+
+  // Suma de todas las cantidades para el contador del encabezado
+  let cantidadCarrito = 0;
+  for (let i = 0; i < carrito.length; i++) {
+    cantidadCarrito = cantidadCarrito + carrito[i].cantidad;
+  }
 
   return (
     <div className="App">
       <Header cantidadCarrito={cantidadCarrito} />
+
       <main className="contenido-principal">
-        <Hero />
-        <div className="tienda-layout">
-          <section className="seccion-productos" id="productos">
-            <div className="titulo-seccion">
-              <p>Catálogo</p>
-              <h2>Productos Destacados</h2>
-            </div>
-            {cargando && <p>Cargando productos...</p>}
-            {mensaje && <p role="alert">{mensaje}</p>}
-            {!cargando && !mensaje && (
-              <ProductCard productos={productos} onAgregar={agregarProducto} />
-            )}
-          </section>
-          <Carrito
-            carrito={carrito}
-            inventario={productos}
-            onEliminar={(id) =>
-              setCarrito((actual) => actual.filter((item) => item.id !== id))
+        <Routes>
+          <Route path="/" element={<Inicio onAgregar={agregarProducto} />} />
+          <Route path="/productos" element={<Catalogo onAgregar={agregarProducto} />} />
+          <Route path="/producto/:id" element={<Detalle />} />
+          <Route
+            path="/carrito"
+            element={
+              <Carrito
+                carrito={carrito}
+                onEliminar={eliminarProducto}
+                onAumentar={function (id) { cambiarCantidad(id, 1); }}
+                onDisminuir={function (id) { cambiarCantidad(id, -1); }}
+              />
             }
-            onAumentar={(id) => cambiarCantidad(id, 1)}
-            onDisminuir={(id) => cambiarCantidad(id, -1)}
           />
-        </div>
+          <Route path="/login" element={<Login />} />
+          <Route path="/mi-cuenta" element={<MiCuenta />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="*" element={<NoEncontrada />} />
+        </Routes>
       </main>
+
       <Footer />
     </div>
   );
