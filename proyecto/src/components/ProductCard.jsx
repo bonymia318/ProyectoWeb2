@@ -1,16 +1,20 @@
 import { Link } from "react-router-dom";
 
-function TarjetaProducto({ producto, onAgregar }) {
-    const disponible = producto.stock > 0;
+function TarjetaProducto({ producto, onAgregar, carrito }) {
+    const itemEnCarrito = carrito.find(function (item) {
+        return item.id === producto.id;
+    });
+    const cantidadEnCarrito = itemEnCarrito ? itemEnCarrito.cantidad : 0;
+    const stockDisponible = Math.max(producto.stock - cantidadEnCarrito, 0);
+    const disponible = stockDisponible > 0;
 
-    // Valores por defecto: producto agotado
     let claseStock = "producto_stock producto_stock_agotado";
     let textoStock = "Producto agotado";
-    let textoBoton = "No disponible";
+    let textoBoton = "Agotado";
 
     if (disponible) {
         claseStock = "producto_stock producto_stock_disponible";
-        textoStock = "Stock: " + producto.stock + " disponibles";
+        textoStock = "Disponibles: " + stockDisponible;
         textoBoton = "Agregar al carrito";
     }
 
@@ -32,7 +36,9 @@ function TarjetaProducto({ producto, onAgregar }) {
             <p className={claseStock}>{textoStock}</p>
             <button
                 type="button"
-                onClick={function () { onAgregar(producto); }}
+                onClick={function () {
+                    onAgregar(producto);
+                }}
                 disabled={!disponible}
             >
                 {textoBoton}
@@ -41,7 +47,7 @@ function TarjetaProducto({ producto, onAgregar }) {
     );
 }
 
-function ProductCard({ productos, onAgregar }) {
+function ProductCard({ productos, onAgregar, carrito }) {
     return (
         <div className="catalogo">
             {productos.map(function (producto) {
@@ -50,6 +56,7 @@ function ProductCard({ productos, onAgregar }) {
                         key={producto.id}
                         producto={producto}
                         onAgregar={onAgregar}
+                        carrito={carrito}
                     />
                 );
             })}

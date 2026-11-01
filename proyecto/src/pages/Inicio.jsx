@@ -3,7 +3,7 @@ import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
 import { obtenerProductos } from "../services/apiServices";
 
-function Inicio({ onAgregar }) {
+function Inicio({ onAgregar, carrito }) {
     const [destacados, setDestacados] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
@@ -11,8 +11,11 @@ function Inicio({ onAgregar }) {
     useEffect(function () {
         async function cargar() {
             try {
-                const lista = await obtenerProductos(4, 0);
-                setDestacados(lista);
+                const resultado = await obtenerProductos({
+                    limite: 4,
+                    saltar: 0
+                });
+                setDestacados(resultado.productos);
             } catch (e) {
                 setError(e.message);
             }
@@ -32,7 +35,11 @@ function Inicio({ onAgregar }) {
                 {cargando && <p>Cargando productos...</p>}
                 {error && <p role="alert">{error}</p>}
                 {!cargando && !error && (
-                    <ProductCard productos={destacados} onAgregar={onAgregar} />
+                    <ProductCard
+                        productos={destacados}
+                        onAgregar={onAgregar}
+                        carrito={carrito}
+                    />
                 )}
             </section>
         </div>

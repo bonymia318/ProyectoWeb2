@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -13,42 +13,73 @@ import NoEncontrada from "./pages/NoEncontrada";
 import "./App.css";
 
 function App() {
-  const [carrito, setCarrito] = useState([]);
+  const [carrito, setCarrito] = useState(function () {
+    try {
+      const carritoGuardado = localStorage.getItem("carrito");
+      const productosGuardados = carritoGuardado
+        ? JSON.parse(carritoGuardado)
+        : [];
+
+      if (!Array.isArray(productosGuardados)) {
+        throw new Error("El contenido guardado del carrito no es válido.");
+      }
+
+      return productosGuardados;
+    } catch (error) {
+      console.error("No se pudo recuperar el carrito de localStorage:", error);
+      return [];
+    }
+  });
+
+  useEffect(function () {
+    try {
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+    } catch (error) {
+      console.error("No se pudo guardar el carrito en localStorage:", error);
+    }
+  }, [carrito]);
 
   // Agrega un producto o suma 1 a su cantidad (sin pasar del stock)
   function agregarProducto(producto) {
-    const existente = carrito.find(function (item) {
-      return item.id === producto.id;
-    });
-
-    if (existente) {
-      if (existente.cantidad >= producto.stock) {
-        return;
+    setCarrito(function (carritoActual) {
+      if (!Number.isFinite(producto.stock) || producto.stock <= 0) {
+        return carritoActual;
       }
-      const nuevoCarrito = carrito.map(function (item) {
-        if (item.id === producto.id) {
-          return { ...item, cantidad: item.cantidad + 1 };
-        }
-        return item;
+
+      const existente = carritoActual.find(function (item) {
+        return item.id === producto.id;
       });
-      setCarrito(nuevoCarrito);
-    } else {
-      setCarrito([...carrito, { ...producto, cantidad: 1 }]);
-    }
+
+      if (existente) {
+        if (existente.cantidad >= producto.stock) {
+          return carritoActual;
+        }
+
+        return carritoActual.map(function (item) {
+          if (item.id === producto.id) {
+            return { ...item, cantidad: item.cantidad + 1 };
+          }
+          return item;
+        });
+      }
+
+      return [...carritoActual, { ...producto, cantidad: 1 }];
+    });
   }
 
   // cambio vale +1 o -1; la cantidad debe quedar entre 1 y el stock
   function cambiarCantidad(id, cambio) {
-    const nuevoCarrito = carrito.map(function (item) {
-      if (item.id === id) {
-        const nuevaCantidad = item.cantidad + cambio;
-        if (nuevaCantidad >= 1 && nuevaCantidad <= item.stock) {
-          return { ...item, cantidad: nuevaCantidad };
+    setCarrito(function (carritoActual) {
+      return carritoActual.map(function (item) {
+        if (item.id === id) {
+          const nuevaCantidad = item.cantidad + cambio;
+          if (nuevaCantidad >= 1 && nuevaCantidad <= item.stock) {
+            return { ...item, cantidad: nuevaCantidad };
+          }
         }
-      }
-      return item;
+        return item;
+      });
     });
-    setCarrito(nuevoCarrito);
   }
 
   function eliminarProducto(id) {
@@ -56,6 +87,10 @@ function App() {
       return item.id !== id;
     });
     setCarrito(nuevoCarrito);
+  }
+
+  function vaciarCarrito() {
+    setCarrito([]);
   }
 
   // Suma de todas las cantidades para el contador del encabezado
@@ -70,9 +105,33 @@ function App() {
 
       <main className="contenido-principal">
         <Routes>
-          <Route path="/" element={<Inicio onAgregar={agregarProducto} />} />
-          <Route path="/productos" element={<Catalogo onAgregar={agregarProducto} />} />
-          <Route path="/producto/:id" element={<Detalle />} />
+          <Route
+            path="/"
+            element={
+              <Inicio
+                onAgregar={agregarProducto}
+                carrito={carrito}
+              />
+            }
+          />
+          <Route
+            path="/productos"
+            element={
+              <Catalogo
+                onAgregar={agregarProducto}
+                carrito={carrito}
+              />
+            }
+          />
+          <Route
+            path="/producto/:id"
+            element={
+              <Detalle
+                onAgregar={agregarProducto}
+                carrito={carrito}
+              />
+            }
+          />
           <Route
             path="/carrito"
             element={
@@ -81,6 +140,7 @@ function App() {
                 onEliminar={eliminarProducto}
                 onAumentar={function (id) { cambiarCantidad(id, 1); }}
                 onDisminuir={function (id) { cambiarCantidad(id, -1); }}
+                onVaciar={vaciarCarrito}
               />
             }
           />

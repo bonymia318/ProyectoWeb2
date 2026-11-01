@@ -1,6 +1,6 @@
 import ListaCarrito from "../components/ListaCarrito";
 
-function Carrito({ carrito, onEliminar, onAumentar, onDisminuir }) {
+function Carrito({ carrito, onEliminar, onAumentar, onDisminuir, onVaciar }) {
     return (
         <section>
             <div className="titulo-seccion">
@@ -12,6 +12,7 @@ function Carrito({ carrito, onEliminar, onAumentar, onDisminuir }) {
                 onEliminar={onEliminar}
                 onAumentar={onAumentar}
                 onDisminuir={onDisminuir}
+                onVaciar={onVaciar}
             />
         </section>
     );

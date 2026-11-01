@@ -1,4 +1,4 @@
-function ListaCarrito({ carrito, onEliminar, onAumentar, onDisminuir }) {
+function ListaCarrito({ carrito, onEliminar, onAumentar, onDisminuir, onVaciar }) {
     // Suma de precio por cantidad de cada producto
     let total = 0;
     for (let i = 0; i < carrito.length; i++) {
@@ -32,8 +32,14 @@ function ListaCarrito({ carrito, onEliminar, onAumentar, onDisminuir }) {
                                     >
                                         +
                                     </button>
-                                    <span>× ${producto.precio.toLocaleString("es-MX")}</span>
+                                    <span>
+                                        Precio: ${producto.precio.toLocaleString("es-MX")}
+                                    </span>
                                 </div>
+                                <p>
+                                    Subtotal: $
+                                    {(producto.precio * producto.cantidad).toLocaleString("es-MX")}
+                                </p>
                             </div>
                             <button
                                 className="carrito-eliminar"
@@ -51,6 +57,13 @@ function ListaCarrito({ carrito, onEliminar, onAumentar, onDisminuir }) {
                 <span>Total</span>
                 <strong>${total.toLocaleString("es-MX")}</strong>
             </div>
+            <button
+                className="carrito-eliminar"
+                type="button"
+                onClick={onVaciar}
+            >
+                Vaciar carrito
+            </button>
         </aside>
     );
 }

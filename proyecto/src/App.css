@@ -171,6 +171,13 @@
   color: #dc2626;
 }
 
+.producto_stock_aviso {
+  margin-top: 8px;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: bold;
+}
+
 /* margin-top: auto empuja el botón al fondo de la tarjeta */
 .producto button {
   margin-top: auto;
@@ -311,4 +318,146 @@
 
 .seccion-productos {
   margin-top: 40px;
+}
+
+button {
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.96);
+  filter: brightness(0.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}
+
+.detalle-producto {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+}
+
+.detalle-galeria,
+.detalle-informacion,
+.detalle-resenas {
+  min-width: 0;
+}
+
+.detalle-imagen-principal {
+  width: 100%;
+  height: 380px;
+  object-fit: contain;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: white;
+}
+
+.detalle-miniaturas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.detalle-miniatura {
+  width: 68px;
+  height: 68px;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+
+.detalle-miniatura.seleccionada {
+  border: 2px solid #2563eb;
+}
+
+.detalle-miniatura img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.detalle-informacion > * {
+  margin-bottom: 14px;
+}
+
+.detalle-precios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.detalle-precio-anterior {
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+.detalle-precios strong {
+  color: #1d4ed8;
+  font-size: 24px;
+}
+
+.detalle-descuento {
+  color: #15803d;
+  font-weight: bold;
+}
+
+.detalle-agregar {
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.detalle-agregar:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.detalle-agregar:disabled {
+  background-color: #d1d5db;
+  color: #4b5563;
+  cursor: not-allowed;
+}
+
+.detalle-resenas {
+  grid-column: 1 / -1;
+}
+
+.detalle-resena {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+}
+
+.detalle-resena p {
+  margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+  .detalle-producto {
+    grid-template-columns: 1fr;
+  }
+
+  .detalle-imagen-principal {
+    height: 280px;
+  }
+
+  .detalle-resenas {
+    grid-column: auto;
+  }
 }
