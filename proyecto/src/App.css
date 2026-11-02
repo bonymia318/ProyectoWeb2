@@ -745,3 +745,31 @@ button:not(:disabled):active {
   margin-top: 12px;
   background-color: #dc2626;
 }
+
+.cargando {
+  margin-bottom: 24px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.mensaje-error {
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.mensaje-error p {
+  margin-bottom: 10px;
+}
+
+.mensaje-error button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #dc2626;
+  color: white;
+  cursor: pointer;
+}

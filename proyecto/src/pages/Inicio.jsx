@@ -1,28 +1,34 @@
-import { useEffect, useState } from "react";
 import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
-import { obtenerProductos } from "../services/apiServices";
+import Cargando from "../components/Cargando";
+import MensajeError from "../components/MensajeError";
+import useProductos from "../hooks/useProductos";
 
 function Inicio({ onAgregar, carrito }) {
-    const [destacados, setDestacados] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState("");
+    // Los 4 primeros productos como destacados
+    const { productos, cargando, error, reintentar } = useProductos(
+        "",
+        "",
+        "title-asc",
+        0,
+        4
+    );
 
-    useEffect(function () {
-        async function cargar() {
-            try {
-                const resultado = await obtenerProductos({
-                    limite: 4,
-                    saltar: 0
-                });
-                setDestacados(resultado.productos);
-            } catch (e) {
-                setError(e.message);
-            }
-            setCargando(false);
-        }
-        cargar();
-    }, []);
+    let contenido = null;
+
+    if (cargando) {
+        contenido = <Cargando mensaje="Cargando productos..." />;
+    } else if (error) {
+        contenido = <MensajeError mensaje={error} onReintentar={reintentar} />;
+    } else {
+        contenido = (
+            <ProductCard
+                productos={productos}
+                onAgregar={onAgregar}
+                carrito={carrito}
+            />
+        );
+    }
 
     return (
         <div>
@@ -32,15 +38,7 @@ function Inicio({ onAgregar, carrito }) {
                     <p>Catálogo</p>
                     <h2>Productos destacados</h2>
                 </div>
-                {cargando && <p>Cargando productos...</p>}
-                {error && <p role="alert">{error}</p>}
-                {!cargando && !error && (
-                    <ProductCard
-                        productos={destacados}
-                        onAgregar={onAgregar}
-                        carrito={carrito}
-                    />
-                )}
+                {contenido}
             </section>
         </div>
     );
