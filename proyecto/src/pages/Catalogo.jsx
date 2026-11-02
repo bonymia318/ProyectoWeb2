@@ -8,10 +8,13 @@ import Cargando from "../components/Cargando";
 import MensajeError from "../components/MensajeError";
 import useProductos from "../hooks/useProductos";
 import useCategorias from "../hooks/useCategorias";
+import useCarrito from "../hooks/useCarrito";
 
 const PRODUCTOS_POR_PAGINA = 12;
 
-function Catalogo({ onAgregar, carrito }) {
+function Catalogo() {
+    const { carrito, agregarProducto } = useCarrito();
+
     // Lo que se escribe en el buscador y lo que ya se buscó
     const [terminoBusqueda, setTerminoBusqueda] = useState("");
     const [busqueda, setBusqueda] = useState("");
@@ -74,7 +77,7 @@ function Catalogo({ onAgregar, carrito }) {
             <>
                 <ProductCard
                     productos={productos}
-                    onAgregar={onAgregar}
+                    onAgregar={agregarProducto}
                     carrito={carrito}
                 />
                 <Paginacion

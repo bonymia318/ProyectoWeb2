@@ -4,7 +4,13 @@ function TarjetaProducto({ producto, onAgregar, carrito }) {
     const itemEnCarrito = carrito.find(function (item) {
         return item.id === producto.id;
     });
-    const cantidadEnCarrito = itemEnCarrito ? itemEnCarrito.cantidad : 0;
+
+    // Cuántas unidades de este producto ya están en el carrito
+    let cantidadEnCarrito = 0;
+    if (itemEnCarrito) {
+        cantidadEnCarrito = itemEnCarrito.cantidad;
+    }
+
     const stockDisponible = Math.max(producto.stock - cantidadEnCarrito, 0);
     const disponible = stockDisponible > 0;
 

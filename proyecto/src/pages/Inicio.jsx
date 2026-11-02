@@ -3,8 +3,11 @@ import ProductCard from "../components/ProductCard";
 import Cargando from "../components/Cargando";
 import MensajeError from "../components/MensajeError";
 import useProductos from "../hooks/useProductos";
+import useCarrito from "../hooks/useCarrito";
 
-function Inicio({ onAgregar, carrito }) {
+function Inicio() {
+    const { carrito, agregarProducto } = useCarrito();
+
     // Los 4 primeros productos como destacados
     const { productos, cargando, error, reintentar } = useProductos(
         "",
@@ -24,7 +27,7 @@ function Inicio({ onAgregar, carrito }) {
         contenido = (
             <ProductCard
                 productos={productos}
-                onAgregar={onAgregar}
+                onAgregar={agregarProducto}
                 carrito={carrito}
             />
         );

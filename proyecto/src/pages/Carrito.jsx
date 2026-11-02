@@ -1,7 +1,24 @@
 import { Link } from "react-router-dom";
 import ListaCarrito from "../components/ListaCarrito";
+import useCarrito from "../hooks/useCarrito";
 
-function Carrito({ carrito, onEliminar, onAumentar, onDisminuir, onVaciar }) {
+function Carrito() {
+    const {
+        carrito,
+        cambiarCantidad,
+        eliminarProducto,
+        vaciarCarrito
+    } = useCarrito();
+
+    // Adaptadores: ListaCarrito recibe funciones que solo piden el id
+    function aumentar(id) {
+        cambiarCantidad(id, 1);
+    }
+
+    function disminuir(id) {
+        cambiarCantidad(id, -1);
+    }
+
     return (
         <section>
             <div className="titulo-seccion">
@@ -10,10 +27,10 @@ function Carrito({ carrito, onEliminar, onAumentar, onDisminuir, onVaciar }) {
             </div>
             <ListaCarrito
                 carrito={carrito}
-                onEliminar={onEliminar}
-                onAumentar={onAumentar}
-                onDisminuir={onDisminuir}
-                onVaciar={onVaciar}
+                onEliminar={eliminarProducto}
+                onAumentar={aumentar}
+                onDisminuir={disminuir}
+                onVaciar={vaciarCarrito}
             />
             {carrito.length > 0 && (
                 <Link className="boton-principal carrito-checkout" to="/checkout">

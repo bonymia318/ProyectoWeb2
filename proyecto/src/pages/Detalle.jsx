@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { obtenerProductoPorId } from "../services/apiServices";
+import useCarrito from "../hooks/useCarrito";
 
-function Detalle({ onAgregar, carrito }) {
+function Detalle() {
+    // El carrito viene del contexto; los hooks siempre van antes de los return
+    const { carrito, agregarProducto } = useCarrito();
     const { id } = useParams();
     const [producto, setProducto] = useState(null);
     const [imagenSeleccionada, setImagenSeleccionada] = useState("");
@@ -134,7 +137,7 @@ function Detalle({ onAgregar, carrito }) {
     }
 
     function agregarAlCarrito() {
-        onAgregar(producto, cantidad);
+        agregarProducto(producto, cantidad);
         setCantidad(1);
     }
 

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { iniciarSesion } from "../services/authService";
+import useSesion from "../hooks/useSesion";
 
-function Login({ onLogin }) {
+function Login() {
+    const { guardarSesion } = useSesion();
     const navigate = useNavigate();
     const [usuario, setUsuario] = useState("");
     const [contrasena, setContrasena] = useState("");
@@ -23,7 +25,7 @@ function Login({ onLogin }) {
 
         try {
             const datosUsuario = await iniciarSesion(usuario.trim(), contrasena);
-            onLogin(datosUsuario);
+            guardarSesion(datosUsuario);
             navigate("/mi-cuenta");
         } catch (e) {
             setError(e.message);

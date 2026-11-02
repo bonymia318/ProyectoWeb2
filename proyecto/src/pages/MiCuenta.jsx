@@ -1,4 +1,8 @@
-function MiCuenta({ sesion, onCerrarSesion }) {
+import useSesion from "../hooks/useSesion";
+
+function MiCuenta() {
+    const { sesion, cerrarSesion } = useSesion();
+
     return (
         <section className="cuenta">
             <div className="titulo-seccion">
@@ -16,7 +20,7 @@ function MiCuenta({ sesion, onCerrarSesion }) {
                 <p>Correo: {sesion.correo}</p>
                 <p>Usuario: {sesion.usuario}</p>
 
-                <button type="button" onClick={onCerrarSesion}>
+                <button type="button" onClick={cerrarSesion}>
                     Cerrar sesión
                 </button>
             </div>

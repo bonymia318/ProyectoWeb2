@@ -1,5 +1,6 @@
 const URL_BASE = "https://dummyjson.com";
 
+// Convierte un producto de la API (en inglés) al formato de nuestra app
 function adaptarProducto(producto) {
     return {
         id: producto.id,
@@ -17,6 +18,7 @@ function adaptarProducto(producto) {
     };
 }
 
+// Hace la petición y lanza un error si la respuesta no es exitosa
 async function obtenerDatos(url) {
     const respuesta = await fetch(url);
 
@@ -27,6 +29,7 @@ async function obtenerDatos(url) {
     return respuesta.json();
 }
 
+// Lista de categorías con el formato { slug, nombre }
 export async function obtenerCategorias() {
     const categorias = await obtenerDatos(`${URL_BASE}/products/categories`);
 
@@ -38,6 +41,9 @@ export async function obtenerCategorias() {
     });
 }
 
+// Sin búsqueda la API pagina, filtra por categoría y ordena.
+// Con búsqueda se piden todos los resultados y se filtran, ordenan
+// y paginan aquí, porque /products/search no combina estas opciones.
 export async function obtenerProductos({
     busqueda = "",
     categoria = "",
@@ -46,27 +52,37 @@ export async function obtenerProductos({
     ordenarPor = "title",
     orden = "asc"
 } = {}) {
+    const textoBusqueda = busqueda.trim();
+    const hayBusqueda = textoBusqueda !== "";
+
+    // limit=0 en la API significa "sin límite"
+    let limiteApi = limite;
+    let saltarApi = saltar;
+    if (hayBusqueda) {
+        limiteApi = 0;
+        saltarApi = 0;
+    }
+
     const parametros = new URLSearchParams({
-        limit: String(busqueda.trim() ? 0 : limite),
-        skip: String(busqueda.trim() ? 0 : saltar),
+        limit: String(limiteApi),
+        skip: String(saltarApi),
         sortBy: ordenarPor,
         order: orden
     });
 
-    let ruta;
-    if (busqueda.trim()) {
-        parametros.set("q", busqueda.trim());
+    // Se elige la ruta según lo que pidió el usuario
+    let ruta = "/products";
+    if (hayBusqueda) {
+        parametros.set("q", textoBusqueda);
         ruta = "/products/search";
-    } else {
-        ruta = categoria
-            ? `/products/category/${encodeURIComponent(categoria)}`
-            : "/products";
+    } else if (categoria) {
+        ruta = `/products/category/${encodeURIComponent(categoria)}`;
     }
 
     const datos = await obtenerDatos(`${URL_BASE}${ruta}?${parametros.toString()}`);
     let productos = datos.products.map(adaptarProducto);
 
-    if (busqueda.trim()) {
+    if (hayBusqueda) {
         if (categoria) {
             productos = productos.filter(function (producto) {
                 return producto.categoria === categoria;
@@ -108,6 +124,7 @@ export async function obtenerProductos({
     };
 }
 
+// Un solo producto por su id (para la página de detalle)
 export async function obtenerProductoPorId(id) {
     const producto = await obtenerDatos(
         `${URL_BASE}/products/${encodeURIComponent(id)}`

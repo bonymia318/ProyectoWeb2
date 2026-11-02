@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useCarrito from "../hooks/useCarrito";
 
 const CAMPOS_INICIALES = {
     nombre: "",
@@ -10,6 +11,7 @@ const CAMPOS_INICIALES = {
     codigoPostal: ""
 };
 
+// Regresa el mensaje de error de un campo, o "" si está bien
 function validarCampo(campo, valor) {
     const texto = valor.trim();
 
@@ -50,7 +52,8 @@ function formatoMoneda(cantidad) {
     });
 }
 
-function Checkout({ carrito, onVaciar }) {
+function Checkout() {
+    const { carrito, vaciarCarrito } = useCarrito();
     const [valores, setValores] = useState(CAMPOS_INICIALES);
     const [errores, setErrores] = useState({});
     const [tocados, setTocados] = useState({});
@@ -109,13 +112,14 @@ function Checkout({ carrito, onVaciar }) {
             return;
         }
 
+        // Se guarda una copia del pedido antes de vaciar el carrito
         setConfirmacion({
             productos: carrito.map(function (producto) {
                 return { ...producto };
             }),
             total
         });
-        onVaciar();
+        vaciarCarrito();
     }
 
     if (confirmacion) {
@@ -195,6 +199,18 @@ function Checkout({ carrito, onVaciar }) {
                         const errorVisible = tocados[campo.nombre] && errores[campo.nombre];
                         const idError = `${campo.nombre}-error`;
 
+                        // Teléfono y código postal abren el teclado numérico en el celular
+                        let modoEntrada = undefined;
+                        if (campo.nombre === "telefono" || campo.nombre === "codigoPostal") {
+                            modoEntrada = "numeric";
+                        }
+
+                        // Solo se enlaza el mensaje de error si está visible
+                        let descripcionError = undefined;
+                        if (errorVisible) {
+                            descripcionError = idError;
+                        }
+
                         return (
                             <div className="checkout-campo" key={campo.nombre}>
                                 <label htmlFor={campo.nombre}>{campo.etiqueta}</label>
@@ -206,15 +222,10 @@ function Checkout({ carrito, onVaciar }) {
                                     onChange={cambiarCampo}
                                     onBlur={validarAlSalir}
                                     autoComplete={campo.autoComplete}
-                                    inputMode={
-                                        campo.nombre === "telefono" ||
-                                            campo.nombre === "codigoPostal"
-                                            ? "numeric"
-                                            : undefined
-                                    }
+                                    inputMode={modoEntrada}
                                     aria-required="true"
                                     aria-invalid={Boolean(errorVisible)}
-                                    aria-describedby={errorVisible ? idError : undefined}
+                                    aria-describedby={descripcionError}
                                 />
                                 {errorVisible && (
                                     <p className="checkout-error" id={idError} role="alert">

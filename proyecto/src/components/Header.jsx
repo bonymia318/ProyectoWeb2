@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
+import useCarrito from "../hooks/useCarrito";
+import useSesion from "../hooks/useSesion";
 
-function Header({ cantidadCarrito, sesion }) {
+function Header() {
+    // Estos datos vienen de los contextos, ya no por props
+    const { cantidadCarrito } = useCarrito();
+    const { sesion } = useSesion();
+
     // El enlace cambia según haya o no sesión
     let enlaceSesion = <Link to="/login">Iniciar sesión</Link>;
 
