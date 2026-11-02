@@ -146,7 +146,15 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/mi-cuenta" element={<MiCuenta />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/checkout"
+            element={
+              <Checkout
+                carrito={carrito}
+                onVaciar={vaciarCarrito}
+              />
+            }
+          />
           <Route path="*" element={<NoEncontrada />} />
         </Routes>
       </main>

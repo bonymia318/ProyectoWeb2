@@ -10,6 +10,8 @@ const PRODUCTOS_POR_PAGINA = 12;
 function Catalogo({ onAgregar, carrito }) {
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
+    const [terminoBusqueda, setTerminoBusqueda] = useState("");
+    const [busqueda, setBusqueda] = useState("");
     const [categoria, setCategoria] = useState("");
     const [orden, setOrden] = useState("title-asc");
     const [pagina, setPagina] = useState(0);
@@ -54,6 +56,7 @@ function Catalogo({ onAgregar, carrito }) {
 
             try {
                 const resultado = await obtenerProductos({
+                    busqueda,
                     categoria,
                     limite: PRODUCTOS_POR_PAGINA,
                     saltar: pagina * PRODUCTOS_POR_PAGINA,
@@ -81,7 +84,7 @@ function Catalogo({ onAgregar, carrito }) {
         return function () {
             vigente = false;
         };
-    }, [categoria, orden, pagina, intento]);
+    }, [busqueda, categoria, orden, pagina, intento]);
 
     const totalPaginas = Math.ceil(total / PRODUCTOS_POR_PAGINA);
 
@@ -95,12 +98,45 @@ function Catalogo({ onAgregar, carrito }) {
         setPagina(0);
     }
 
+    function buscarProductos(evento) {
+        evento.preventDefault();
+        setBusqueda(terminoBusqueda.trim());
+        setPagina(0);
+    }
+
+    function limpiarBusqueda() {
+        setTerminoBusqueda("");
+        setBusqueda("");
+        setPagina(0);
+    }
+
     return (
         <section className="seccion-productos">
             <div className="titulo-seccion">
                 <p>Catálogo</p>
                 <h2>Todos los productos</h2>
             </div>
+
+            <form className="catalogo-buscador" onSubmit={buscarProductos}>
+                <label htmlFor="buscar-productos">Buscar por nombre</label>
+                <div className="catalogo-buscador-campos">
+                    <input
+                        id="buscar-productos"
+                        type="search"
+                        value={terminoBusqueda}
+                        onChange={function (evento) {
+                            setTerminoBusqueda(evento.target.value);
+                        }}
+                        placeholder="Ej. teléfono, laptop..."
+                    />
+                    <button type="submit">Buscar</button>
+                    {busqueda && (
+                        <button type="button" onClick={limpiarBusqueda}>
+                            Limpiar
+                        </button>
+                    )}
+                </div>
+            </form>
 
             <div className="catalogo-controles">
                 <label>
