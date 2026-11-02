@@ -28,11 +28,8 @@ function validarCampo(campo, valor) {
         return "Escribe un correo electrónico válido.";
     }
 
-    if (campo === "telefono") {
-        const digitos = texto.replace(/\D/g, "");
-        if (digitos.length < 10 || digitos.length > 15) {
-            return "El teléfono debe tener entre 10 y 15 dígitos.";
-        }
+    if (campo === "telefono" && !/^\d{10}$/.test(texto)) {
+        return "El teléfono debe tener exactamente 10 dígitos.";
     }
 
     if (campo === "direccion" && texto.length < 5) {
@@ -211,7 +208,7 @@ function Checkout({ carrito, onVaciar }) {
                                     autoComplete={campo.autoComplete}
                                     inputMode={
                                         campo.nombre === "telefono" ||
-                                        campo.nombre === "codigoPostal"
+                                            campo.nombre === "codigoPostal"
                                             ? "numeric"
                                             : undefined
                                     }

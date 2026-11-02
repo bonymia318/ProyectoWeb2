@@ -74,13 +74,26 @@ export async function obtenerProductos({
         }
 
         productos.sort(function (a, b) {
-            const valorA = a[ordenarPor === "title" ? "nombre" : ordenarPor];
-            const valorB = b[ordenarPor === "title" ? "nombre" : ordenarPor];
-            const comparacion = typeof valorA === "string"
-                ? valorA.localeCompare(valorB, "es", { sensitivity: "base" })
-                : valorA - valorB;
+            // En el adaptador el título se llama "nombre" y el precio "precio"
+            let campo = "nombre";
+            if (ordenarPor === "price") {
+                campo = "precio";
+            }
 
-            return orden === "desc" ? -comparacion : comparacion;
+            const valorA = a[campo];
+            const valorB = b[campo];
+
+            let comparacion = 0;
+            if (typeof valorA === "string") {
+                comparacion = valorA.localeCompare(valorB, "es", { sensitivity: "base" });
+            } else {
+                comparacion = valorA - valorB;
+            }
+
+            if (orden === "desc") {
+                return -comparacion;
+            }
+            return comparacion;
         });
 
         return {

@@ -6,10 +6,12 @@ function Detalle({ onAgregar, carrito }) {
     const { id } = useParams();
     const [producto, setProducto] = useState(null);
     const [imagenSeleccionada, setImagenSeleccionada] = useState("");
+    const [cantidad, setCantidad] = useState(1);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
     const [intento, setIntento] = useState(0);
 
+    // Carga el producto cada vez que cambia el id o se pulsa "Reintentar"
     useEffect(function () {
         let vigente = true;
 
@@ -22,9 +24,14 @@ function Detalle({ onAgregar, carrito }) {
 
                 if (vigente) {
                     setProducto(resultado);
-                    setImagenSeleccionada(
-                        resultado.imagenes?.[0] || resultado.imagen
-                    );
+
+                    // La primera imagen de la galería, o la miniatura si no hay galería
+                    let primeraImagen = resultado.imagen;
+                    if (resultado.imagenes && resultado.imagenes.length > 0) {
+                        primeraImagen = resultado.imagenes[0];
+                    }
+                    setImagenSeleccionada(primeraImagen);
+                    setCantidad(1);
                 }
             } catch (e) {
                 if (vigente) {
@@ -55,9 +62,7 @@ function Detalle({ onAgregar, carrito }) {
                 <button
                     type="button"
                     onClick={function () {
-                        setIntento(function (actual) {
-                            return actual + 1;
-                        });
+                        setIntento(intento + 1);
                     }}
                 >
                     Reintentar
@@ -76,18 +81,79 @@ function Detalle({ onAgregar, carrito }) {
         );
     }
 
+    // Cuántas unidades de este producto ya están en el carrito
+    let cantidadEnCarrito = 0;
     const productoEnCarrito = carrito.find(function (item) {
         return item.id === producto.id;
     });
-    const cantidadEnCarrito = productoEnCarrito
-        ? productoEnCarrito.cantidad
-        : 0;
-    const stockDisponible = Math.max(producto.stock - cantidadEnCarrito, 0);
-    const imagenes = producto.imagenes?.length
-        ? producto.imagenes
-        : [producto.imagen];
-    const precioConDescuento =
-        producto.precio * (1 - producto.descuento / 100);
+    if (productoEnCarrito) {
+        cantidadEnCarrito = productoEnCarrito.cantidad;
+    }
+
+    // Lo que todavía se puede agregar sin pasar del stock
+    let stockDisponible = producto.stock - cantidadEnCarrito;
+    if (stockDisponible < 0) {
+        stockDisponible = 0;
+    }
+
+    // Lista de imágenes para la galería
+    let imagenes = [producto.imagen];
+    if (producto.imagenes && producto.imagenes.length > 0) {
+        imagenes = producto.imagenes;
+    }
+
+    let marca = "No especificada";
+    if (producto.marca) {
+        marca = producto.marca;
+    }
+
+    let textoStock = "Producto agotado";
+    if (stockDisponible > 0) {
+        textoStock = "Disponibles para agregar: " + stockDisponible;
+    }
+
+    const precioConDescuento = producto.precio * (1 - producto.descuento / 100);
+
+    const opcionesPrecio = {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    };
+
+    // Sube la cantidad sin pasar del stock disponible
+    function aumentarCantidad() {
+        if (cantidad < stockDisponible) {
+            setCantidad(cantidad + 1);
+        }
+    }
+
+    // Baja la cantidad sin bajar de 1
+    function disminuirCantidad() {
+        if (cantidad > 1) {
+            setCantidad(cantidad - 1);
+        }
+    }
+
+    function agregarAlCarrito() {
+        onAgregar(producto, cantidad);
+        setCantidad(1);
+    }
+
+    // Contenido de la sección de reseñas
+    let contenidoResenas = <p>Este producto todavía no tiene reseñas.</p>;
+    if (producto.resenas && producto.resenas.length > 0) {
+        contenidoResenas = producto.resenas.map(function (resena, indice) {
+            return (
+                <article
+                    className="detalle-resena"
+                    key={resena.reviewerName + "-" + indice}
+                >
+                    <strong>{resena.reviewerName}</strong>
+                    <p>Calificación: ⭐ {resena.rating}</p>
+                    <p>{resena.comment}</p>
+                </article>
+            );
+        });
+    }
 
     return (
         <section className="detalle-producto">
@@ -100,20 +166,20 @@ function Detalle({ onAgregar, carrito }) {
 
                 <div className="detalle-miniaturas">
                     {imagenes.map(function (imagen, indice) {
+                        let claseMiniatura = "detalle-miniatura";
+                        if (imagen === imagenSeleccionada) {
+                            claseMiniatura = "detalle-miniatura seleccionada";
+                        }
+
                         return (
                             <button
-                                className={
-                                    imagen === imagenSeleccionada
-                                        ? "detalle-miniatura seleccionada"
-                                        : "detalle-miniatura"
-                                }
+                                className={claseMiniatura}
                                 type="button"
-                                key={`${imagen}-${indice}`}
+                                key={indice}
                                 onClick={function () {
                                     setImagenSeleccionada(imagen);
                                 }}
-                                aria-label={`Ver imagen ${indice + 1}`}
-                                aria-pressed={imagen === imagenSeleccionada}
+                                aria-label={"Ver imagen " + (indice + 1)}
                             >
                                 <img src={imagen} alt="" />
                             </button>
@@ -126,44 +192,48 @@ function Detalle({ onAgregar, carrito }) {
                 <p className="producto_categoria">{producto.categoria}</p>
                 <h2>{producto.nombre}</h2>
                 <p>{producto.descripcion}</p>
-                <p>Marca: {producto.marca || "No especificada"}</p>
+                <p>Marca: {marca}</p>
                 <p>Calificación: ⭐ {producto.calificacion}</p>
 
                 <div className="detalle-precios">
                     <span className="detalle-precio-anterior">
-                        ${producto.precio.toLocaleString("es-MX", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}
+                        ${producto.precio.toLocaleString("es-MX", opcionesPrecio)}
                     </span>
                     <strong>
-                        ${precioConDescuento.toLocaleString("es-MX", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}
+                        ${precioConDescuento.toLocaleString("es-MX", opcionesPrecio)}
                     </strong>
                     <span className="detalle-descuento">
                         {producto.descuento}% de descuento
                     </span>
                 </div>
 
-                <p>
-                    {stockDisponible > 0
-                        ? `Disponibles para agregar: ${stockDisponible}`
-                        : "Producto agotado"}
-                </p>
+                <p>{textoStock}</p>
+
+                <div className="detalle-cantidad">
+                    <button
+                        type="button"
+                        onClick={disminuirCantidad}
+                        disabled={cantidad <= 1}
+                    >
+                        −
+                    </button>
+                    <span>{cantidad}</span>
+                    <button
+                        type="button"
+                        onClick={aumentarCantidad}
+                        disabled={cantidad >= stockDisponible}
+                    >
+                        +
+                    </button>
+                </div>
 
                 <button
                     className="detalle-agregar"
                     type="button"
-                    onClick={function () {
-                        onAgregar(producto);
-                    }}
+                    onClick={agregarAlCarrito}
                     disabled={stockDisponible <= 0}
                 >
-                    {stockDisponible > 0
-                        ? "Agregar al carrito"
-                        : "Stock agotado"}
+                    Agregar al carrito
                 </button>
 
                 <Link className="boton-principal" to="/productos">
@@ -173,28 +243,7 @@ function Detalle({ onAgregar, carrito }) {
 
             <section className="detalle-resenas">
                 <h3>Reseñas</h3>
-
-                {producto.resenas?.length ? (
-                    producto.resenas.map(function (resena, indice) {
-                        return (
-                            <article
-                                className="detalle-resena"
-                                key={`${resena.reviewerName}-${resena.date}-${indice}`}
-                            >
-                                <strong>{resena.reviewerName || "Cliente"}</strong>
-                                <p>Calificación: ⭐ {resena.rating}</p>
-                                <p>{resena.comment}</p>
-                                {resena.date && (
-                                    <small>
-                                        {resena.date.slice(0, 10)}
-                                    </small>
-                                )}
-                            </article>
-                        );
-                    })
-                ) : (
-                    <p>Este producto todavía no tiene reseñas.</p>
-                )}
+                {contenidoResenas}
             </section>
         </section>
     );

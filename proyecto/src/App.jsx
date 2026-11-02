@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import RutaProtegida from "./components/RutaProtegida";
 import Inicio from "./pages/Inicio";
 import Catalogo from "./pages/Catalogo";
 import Detalle from "./pages/Detalle";
@@ -13,24 +14,26 @@ import NoEncontrada from "./pages/NoEncontrada";
 import "./App.css";
 
 function App() {
+  // El carrito se lee de localStorage al iniciar, para no perderlo al recargar
   const [carrito, setCarrito] = useState(function () {
     try {
       const carritoGuardado = localStorage.getItem("carrito");
-      const productosGuardados = carritoGuardado
-        ? JSON.parse(carritoGuardado)
-        : [];
 
-      if (!Array.isArray(productosGuardados)) {
-        throw new Error("El contenido guardado del carrito no es válido.");
+      if (carritoGuardado) {
+        const productosGuardados = JSON.parse(carritoGuardado);
+
+        if (Array.isArray(productosGuardados)) {
+          return productosGuardados;
+        }
       }
-
-      return productosGuardados;
     } catch (error) {
       console.error("No se pudo recuperar el carrito de localStorage:", error);
-      return [];
     }
+
+    return [];
   });
 
+  // Guarda el carrito cada vez que cambia
   useEffect(function () {
     try {
       localStorage.setItem("carrito", JSON.stringify(carrito));
@@ -39,10 +42,51 @@ function App() {
     }
   }, [carrito]);
 
-  // Agrega un producto o suma 1 a su cantidad (sin pasar del stock)
-  function agregarProducto(producto) {
+  // La sesión se lee de localStorage al iniciar, para no perderla al recargar
+  const [sesion, setSesion] = useState(function () {
+    try {
+      const sesionGuardada = localStorage.getItem("sesion");
+
+      if (sesionGuardada) {
+        return JSON.parse(sesionGuardada);
+      }
+    } catch (error) {
+      console.error("No se pudo recuperar la sesión:", error);
+    }
+
+    return null;
+  });
+
+  // Guarda la sesión cada vez que cambia (o la borra si se cerró)
+  useEffect(function () {
+    try {
+      if (sesion) {
+        localStorage.setItem("sesion", JSON.stringify(sesion));
+      } else {
+        localStorage.removeItem("sesion");
+      }
+    } catch (error) {
+      console.error("No se pudo guardar la sesión:", error);
+    }
+  }, [sesion]);
+
+  function guardarSesion(usuario) {
+    setSesion(usuario);
+  }
+
+  function cerrarSesion() {
+    setSesion(null);
+  }
+
+  // Agrega "cantidad" unidades (1 si no se indica), sin pasar del stock
+  function agregarProducto(producto, cantidad) {
+    let cantidadAgregar = 1;
+    if (cantidad) {
+      cantidadAgregar = cantidad;
+    }
+
     setCarrito(function (carritoActual) {
-      if (!Number.isFinite(producto.stock) || producto.stock <= 0) {
+      if (producto.stock <= 0) {
         return carritoActual;
       }
 
@@ -51,19 +95,25 @@ function App() {
       });
 
       if (existente) {
-        if (existente.cantidad >= producto.stock) {
-          return carritoActual;
+        let nuevaCantidad = existente.cantidad + cantidadAgregar;
+        if (nuevaCantidad > producto.stock) {
+          nuevaCantidad = producto.stock;
         }
 
         return carritoActual.map(function (item) {
           if (item.id === producto.id) {
-            return { ...item, cantidad: item.cantidad + 1 };
+            return { ...item, cantidad: nuevaCantidad };
           }
           return item;
         });
       }
 
-      return [...carritoActual, { ...producto, cantidad: 1 }];
+      let cantidadInicial = cantidadAgregar;
+      if (cantidadInicial > producto.stock) {
+        cantidadInicial = producto.stock;
+      }
+
+      return [...carritoActual, { ...producto, cantidad: cantidadInicial }];
     });
   }
 
@@ -83,10 +133,11 @@ function App() {
   }
 
   function eliminarProducto(id) {
-    const nuevoCarrito = carrito.filter(function (item) {
-      return item.id !== id;
+    setCarrito(function (carritoActual) {
+      return carritoActual.filter(function (item) {
+        return item.id !== id;
+      });
     });
-    setCarrito(nuevoCarrito);
   }
 
   function vaciarCarrito() {
@@ -101,7 +152,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header cantidadCarrito={cantidadCarrito} />
+      <Header cantidadCarrito={cantidadCarrito} sesion={sesion} />
 
       <main className="contenido-principal">
         <Routes>
@@ -144,8 +195,15 @@ function App() {
               />
             }
           />
-          <Route path="/login" element={<Login />} />
-          <Route path="/mi-cuenta" element={<MiCuenta />} />
+          <Route path="/login" element={<Login onLogin={guardarSesion} />} />
+          <Route
+            path="/mi-cuenta"
+            element={
+              <RutaProtegida sesion={sesion}>
+                <MiCuenta sesion={sesion} onCerrarSesion={cerrarSesion} />
+              </RutaProtegida>
+            }
+          />
           <Route
             path="/checkout"
             element={
