@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import RutaProtegida from "./components/RutaProtegida";
@@ -13,11 +13,15 @@ import NoEncontrada from "./pages/NoEncontrada";
 import "./App.css";
 
 function App() {
+  const { pathname } = useLocation();
+  const esLogin = pathname === "/login";
+  const esMiCuenta = pathname === "/mi-cuenta";
+
   return (
     <div className="App">
       <Header />
 
-      <main className="contenido-principal">
+      <main className={`contenido-principal${esLogin ? " contenido-login" : ""}${esMiCuenta ? " contenido-cuenta" : ""}`}>
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/productos" element={<Catalogo />} />

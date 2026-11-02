@@ -12,7 +12,6 @@ function Login() {
     const [cargando, setCargando] = useState(false);
 
     async function enviarFormulario(evento) {
-        // Evita que el formulario recargue la página
         evento.preventDefault();
 
         if (usuario.trim() === "" || contrasena === "") {
@@ -33,10 +32,7 @@ function Login() {
         }
     }
 
-    let textoBoton = "Iniciar sesión";
-    if (cargando) {
-        textoBoton = "Iniciando sesión...";
-    }
+    const textoBoton = cargando ? "Iniciando sesión..." : "Iniciar sesión";
 
     return (
         <section className="login">
@@ -52,9 +48,8 @@ function Login() {
                         id="usuario"
                         type="text"
                         value={usuario}
-                        onChange={function (evento) {
-                            setUsuario(evento.target.value);
-                        }}
+                        onChange={(evento) => setUsuario(evento.target.value)}
+                        placeholder="Ingresa tu usuario"
                     />
                 </div>
 
@@ -64,9 +59,8 @@ function Login() {
                         id="contrasena"
                         type="password"
                         value={contrasena}
-                        onChange={function (evento) {
-                            setContrasena(evento.target.value);
-                        }}
+                        onChange={(evento) => setContrasena(evento.target.value)}
+                        placeholder="Ingresa tu contraseña"
                     />
                 </div>
 
