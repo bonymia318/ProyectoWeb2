@@ -4,7 +4,7 @@ const anioActual = new Date().getFullYear();
 function Footer() {
     return (
         <footer className="pie-pagina" id="contacto">
-            <p>{anioActual} TechStore Pro 2026. Todos los derechos reservados. Página creada por Karen y Gio</p>
+            <p>© {anioActual} TechStore Pro. Todos los derechos reservados. Página creada por Karen y Gio</p>
         </footer>
     );
 }

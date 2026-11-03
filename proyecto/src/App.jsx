@@ -13,15 +13,22 @@ import NoEncontrada from "./pages/NoEncontrada";
 import "./App.css";
 
 function App() {
-  const { pathname } = useLocation();
-  const esLogin = pathname === "/login";
-  const esMiCuenta = pathname === "/mi-cuenta";
+  // La ruta actual sirve para centrar el contenido en login y mi cuenta
+  const ubicacion = useLocation();
+
+  let clasePrincipal = "contenido-principal";
+  if (ubicacion.pathname === "/login") {
+    clasePrincipal = "contenido-principal contenido-login";
+  }
+  if (ubicacion.pathname === "/mi-cuenta") {
+    clasePrincipal = "contenido-principal contenido-cuenta";
+  }
 
   return (
     <div className="App">
       <Header />
 
-      <main className={`contenido-principal${esLogin ? " contenido-login" : ""}${esMiCuenta ? " contenido-cuenta" : ""}`}>
+      <main className={clasePrincipal}>
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/productos" element={<Catalogo />} />

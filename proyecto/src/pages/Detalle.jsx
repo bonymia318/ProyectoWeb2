@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { obtenerProductoPorId } from "../services/apiServices";
 import useCarrito from "../hooks/useCarrito";
+import Cargando from "../components/Cargando";
+import MensajeError from "../components/MensajeError";
 
 function Detalle() {
     // El carrito viene del contexto; los hooks siempre van antes de los return
@@ -55,22 +57,21 @@ function Detalle() {
     }, [id, intento]);
 
     if (cargando) {
-        return <p>Cargando detalle del producto...</p>;
+        return <Cargando mensaje="Cargando detalle del producto..." />;
     }
 
     if (error) {
         return (
-            <section role="alert">
-                <p>No se pudo cargar el producto: {error}</p>
-                <button
-                    type="button"
-                    onClick={function () {
+            <section>
+                <MensajeError
+                    mensaje={"No se pudo cargar el producto: " + error}
+                    onReintentar={function () {
                         setIntento(intento + 1);
                     }}
-                >
-                    Reintentar
-                </button>
-                <p><Link to="/productos">Volver al catálogo</Link></p>
+                />
+                <Link className="boton-principal" to="/productos">
+                    Volver al catálogo
+                </Link>
             </section>
         );
     }

@@ -53,15 +53,11 @@ function formatoMoneda(cantidad) {
 }
 
 function Checkout() {
-    const { carrito, vaciarCarrito } = useCarrito();
+    const { carrito, total, vaciarCarrito } = useCarrito();
     const [valores, setValores] = useState(CAMPOS_INICIALES);
     const [errores, setErrores] = useState({});
     const [tocados, setTocados] = useState({});
     const [confirmacion, setConfirmacion] = useState(null);
-
-    const total = carrito.reduce(function (suma, producto) {
-        return suma + producto.precio * producto.cantidad;
-    }, 0);
 
     function cambiarCampo(evento) {
         const { name, value } = evento.target;
