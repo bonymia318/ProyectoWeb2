@@ -1,6 +1,6 @@
 const URL_BASE = "https://dummyjson.com";
 
-// Convierte la respuesta de la API al formato que usa nuestra app
+// Convierte la respuesta de la API 
 function adaptarUsuario(datos) {
     return {
         id: datos.id,

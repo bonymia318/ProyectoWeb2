@@ -1,6 +1,6 @@
 const URL_BASE = "https://dummyjson.com";
 
-// Convierte un producto de la API (en inglés) al formato de nuestra app
+// Convierte un producto de la API 
 function adaptarProducto(producto) {
     return {
         id: producto.id,
@@ -29,7 +29,7 @@ async function obtenerDatos(url) {
     return respuesta.json();
 }
 
-// Lista de categorías con el formato { slug, nombre }
+// Lista de categorías con el formato 
 export async function obtenerCategorias() {
     const categorias = await obtenerDatos(`${URL_BASE}/products/categories`);
 

@@ -303,9 +303,7 @@ body {
   cursor: not-allowed;
 }
 
-/* =========================================
-   BUSCADOR, FILTROS Y CONTROLES
-   ========================================= */
+/* BUSCADOR, FILTROS Y CONTROLES*/
 .catalogo-buscador {
   margin-bottom: 20px;
 }
@@ -364,9 +362,7 @@ body {
   margin-bottom: 24px;
 }
 
-/* =========================================
-   CARRITO Y CHECKOUT
-   ========================================= */
+/* CARRITO Y CHECKOUT */
 .tienda-layout {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -449,9 +445,7 @@ body {
   cursor: pointer;
 }
 
-/* =========================================
-   DETALLE DEL PRODUCTO
-   ========================================= */
+/* DETALLE DEL PRODUCTO*/
 .detalle-producto {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -503,9 +497,7 @@ body {
   cursor: pointer;
 }
 
-/* =========================================
-   PAGINACIÓN Y PIE DE PÁGINA
-   ========================================= */
+/*PAGINACIÓN Y PIE DE PÁGINA */
 .paginacion {
   display: flex;
   justify-content: center;
@@ -539,9 +531,7 @@ body {
   margin-top: auto;
 }
 
-/* =========================================
-   RESPONSIVIDAD AVANZADA (375px Y HASTA 275px)
-   ========================================= */
+/* RESPONSIVIDAD AVANZADA */
 
 /* Ajustes medianos (Tablets y celulares grandes) */
 @media (max-width: 900px) {
@@ -568,7 +558,6 @@ body {
   }
 }
 
-/* Soporte estricto para la rúbrica (375px) y pantallas ultra pequeñas (275px) */
 @media (max-width: 480px) {
   .contenido-principal {
     padding: 20px 4%;
@@ -590,7 +579,7 @@ body {
   }
 
   .catalogo {
-    grid-template-columns: 1fr; /* 1 tarjeta por fila en móviles */
+    grid-template-columns: 1fr; 
   }
 
   .catalogo-buscador-campos {
@@ -612,7 +601,6 @@ body {
   }
 }
 
-/* Protección para 275px: evita cualquier desbordamiento horizontal */
 @media (max-width: 375px) {
   * {
     min-width: 0;
@@ -646,9 +634,7 @@ body {
   }
 }
 
-/* =========================================
-   CORRECCIONES: PÁGINA MI CUENTA
-   ========================================= */
+/*CORRECCIONES: PÁGINA MI CUENTA */
 .cuenta-tarjeta {
   max-width: 440px;
   margin: 0 auto;
@@ -718,9 +704,7 @@ body {
   background-color: #dc2626;
 }
 
-/* =========================================
-   CORRECCIONES: PÁGINA DEL CARRITO
-   ========================================= */
+/*CORRECCIONES: PÁGINA DEL CARRITO */
 .carrito-panel {
   max-width: 760px;
   margin: 0 auto;
@@ -826,9 +810,8 @@ body {
   margin: 24px auto 0;
   text-align: center;
 }
-/* =========================================
-   CORRECCIONES: PÁGINA LOGIN
-   ========================================= */
+
+/* CORRECCIONES: PÁGINA LOGIN */
 .login-formulario {
   max-width: 420px;
   margin: 0 auto;
@@ -1028,9 +1011,7 @@ body {
   }
 }
 
-/* =========================================
-   ESTILOS QUE FALTABAN
-   ========================================= */
+/* ESTILOS QUE FALTABAN*/
 
 /* Estados de carga y error */
 .cargando {
